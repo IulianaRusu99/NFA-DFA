@@ -1,0 +1,10 @@
+pentru starea 0: pentru element 0 elementele:{ -1 -1 -1 -1 } pentru element 1 elementele:{ -1 -1 -1 -1 } 
+pentru starea 1: pentru element 0 elementele:{ -1 -1 -1 -1 } pentru element 1 elementele:{ -1 -1 -1 -1 } 
+pentru starea 2: pentru element 0 elementele:{ -1 -1 -1 -1 } pentru element 1 elementele:{ -1 -1 -1 -1 } 
+pentru starea 3: pentru element 0 elementele:{ -1 -1 -1 -1 } pentru element 1 elementele:{ -1 -1 -1 -1 } 
+
+
+pentru starea 0: pentru element 0 elementele:{ 5 5 -1 -1 } pentru element 1 elementele:{ 5 -1 -1 -1 } 
+pentru starea 1: pentru element 0 elementele:{ -1 -1 5 -1 } pentru element 1 elementele:{ -1 5 -1 -1 } 
+pentru starea 2: pentru element 0 elementele:{ -1 -1 -1 5 } pentru element 1 elementele:{ -1 -1 -1 5 } 
+pentru starea 3: pentru element 0 elementele:{ -1 -1 -1 -1 } pentru element 1 elementele:{ -1 -1 5 -1 } 
