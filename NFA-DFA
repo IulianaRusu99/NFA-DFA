@@ -1,0 +1,306 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+ifstream fin("date.in");
+ofstream fout("date.out");
+
+int main() {
+    int numar_stari;
+
+    fin>>numar_stari;
+    int v_stari[numar_stari];
+    for (int i = 0; i < numar_stari; i++)
+        fin >> v_stari[i];
+
+    int numar_el_alf;
+    fin>>numar_el_alf;
+    char v_alf[numar_el_alf];
+    for (int i = 0; i < numar_el_alf; i++) {
+        fin>>v_alf;
+        v_alf[i] = v_alf[i] - 'a';
+    }
+
+    int stare_initiala;
+    fin>>stare_initiala;
+
+    int nr_st_finale;
+    fin>>nr_st_finale;
+    int v_st_finale[nr_st_finale];
+    for (int i = 0; i < nr_st_finale; i++)
+        fin >> v_st_finale[i];
+
+    int nr_tranzitii;
+    fin>>nr_tranzitii;
+    //umpu matricea cu -1
+    int m_tranz[numar_stari][numar_el_alf + 1][numar_stari + 1];
+    for (int i = 0; i < numar_stari; i++) {
+        for (int j = 0; j < numar_el_alf; j++) {
+            for (int k = 0; k < numar_stari; k++) {
+
+                m_tranz[i][j][k] = -1;
+            }
+        }
+    }
+    for (int i = 0; i < numar_stari; i++) {
+        fout << "pentru starea " << i << ": ";
+        for (int j = 0; j < numar_el_alf; j++) {
+            fout << "pentru element " << j << " elementele:{ ";
+            for (int k = 0; k < numar_stari; k++) {
+                fout << m_tranz[i][j][k] << " ";
+            }
+            fout << "} ";
+
+        }
+        fout << endl;
+    }
+    fout << endl << endl;
+    char alf[20];
+    int st1, st2;
+    char element;
+    for (int m = 0; m < nr_tranzitii; m++) {
+
+        fin >> st1 >> element >>st2;
+        int el = element - 'a';
+        //formez matricea cu starile NFA
+        m_tranz[st1][el][st2] = numar_stari + 1;
+        alf[m] = element;
+    }
+    // afisez matricea initiala de tranzitie NFA
+    cout << "matricea NFA pentru tranzitii: " << endl;
+    cout << "coloana:";
+
+    for (int s = 0; s < numar_el_alf; s++) {
+
+        cout << "              " << s << "(" << alf[s] << ")";
+
+    }
+
+    cout << endl;
+
+    //afisez matricea nfa in care pun 5 unde am tranzitii
+    for (int i = 0; i < numar_stari; i++) {
+        fout << "pentru starea " << i << ": ";
+        cout << "linia " << i << " -> ";
+        for (int j = 0; j < numar_el_alf; j++) {
+            fout << "pentru element " << j << " elementele:{ ";
+
+            for (int k = 0; k < numar_stari; k++) {
+                fout << m_tranz[i][j][k] << " ";
+                if (m_tranz[i][j][k] == numar_stari + 1)
+                    cout << "  " << k << " ";
+                else
+                    cout << "  ~ ";
+            }
+            cout << "    ";
+
+            fout << "} ";
+
+        }
+        fout << endl;
+        cout << endl;
+    }
+    cout << endl << endl;
+
+    //partea de conversie
+
+    //intr-un vector de stari finale pun starile de pe linia starii initiale
+    //vector in care codez starea initiala
+    int v_initial[numar_stari];
+    for (int i = 0; i < numar_stari; i++) {
+        if (i == stare_initiala)
+            v_initial[i] = numar_stari + 1;
+        else
+            v_initial[i] = -1;
+    }
+    cout << "v st init" << endl;
+    for (int i = 0; i < numar_stari; i++)
+        cout << v_initial[i] << " ";
+    // am pus starea initiala in vectorul final
+    int i = stare_initiala;
+    int nr_stari_DFA = 0;
+    int stare_curenta_dfa = 0;
+    int v_stari_finaleDFA[20][numar_stari];
+    for (int k = 0; k < numar_stari; k++) {
+        v_stari_finaleDFA[stare_curenta_dfa][k] = v_initial[k];
+    }
+    nr_stari_DFA++;
+    cout << "\nv in stari finale" << endl;
+    for (int j = 0; j < nr_stari_DFA; j++) {
+        for (int k = 0; k < numar_stari; k++) {
+
+            cout << v_stari_finaleDFA[j][k] << " ";
+        }
+        cout << endl;
+
+    }
+    cout << endl;
+    cout << "aici starea curenta este: " << stare_curenta_dfa << endl;
+    int r;
+    int gasit;
+    r = stare_initiala;
+    int v_aux[numar_stari + 1];
+
+
+
+    for (int j = 0; j < numar_el_alf; j++) {
+
+        cout << "\nvector " << j << " auxiliar   ";
+
+        for (int k = 0; k < numar_stari; k++) {
+            //formez un vector auxiliar pentru a vf daca starea nu este deja in vect final
+            v_aux[k] = m_tranz[r][j][k];
+            cout << v_aux[k] << " ";
+        }
+        cout << endl;
+        gasit = 0; //pp ca am stari diferite
+        for (int w = 0; w < nr_stari_DFA; w++) {
+            int ok = 1; //pp ca am stare egala
+            cout << "w = " << w << "  gasit= " << gasit << " ok= " << ok << endl;
+
+            cout << endl;
+            for (int i = 0; i < numar_stari; i++) {
+                if (v_stari_finaleDFA[w][i] != v_aux[i]) {
+                    ok = 0;
+                    cout << "ok= " << ok << endl;
+                    break;
+                }
+            }
+            if (ok == 1) {
+                cout << "stari identice" << endl;
+                gasit = 1; //am gasit stari identice
+                cout << "gasit= " << gasit << endl;
+
+            }
+
+            if (gasit == 1) {
+                cout << "break " << endl;
+                break;
+            }
+
+        }
+        if (gasit == 1) // starea mea exista in vector deja... am gasit o stare identica
+            cout << "stari identice" << endl;
+        else {
+            if (gasit == 0) {
+
+                cout << "gasit= " << gasit << " am gasit o stare noua in v finala " << stare_curenta_dfa + 1 << endl;
+                nr_stari_DFA++;
+                stare_curenta_dfa++;
+                //adaug in vect stari finale
+                cout << "aici starea curenta este: " << stare_curenta_dfa << endl;
+
+                cout << "v aux pe care il pun in v final  " << endl;
+
+
+                cout << "in final" << endl;
+                for (int s = 0; s < numar_stari; s++) {
+                    v_stari_finaleDFA[stare_curenta_dfa][s] = v_aux[s];
+                    cout << v_stari_finaleDFA[stare_curenta_dfa][s] << " ";
+
+                }
+            }
+        }
+
+    }
+    
+    //formez celelalte stari
+    int vect_aux[ numar_stari + 1];
+    for (int i = 1; i < nr_stari_DFA; i++) {
+        //ma duc pe fiecare stare si vf
+        int v_stare[numar_stari + 1];
+        for (int z = 0; z < numar_stari; z++)
+            v_stare[z] = -1;
+        for (int k = 0; k < numar_stari; k++) {
+            v_stare[k] = v_stari_finaleDFA[i][k];
+        }
+
+
+        for (int h = 0; h < numar_el_alf; h++) {
+            for (int y = 0; y < numar_stari; y++)
+                vect_aux[y] = -1;
+            for (int p = 0; p < numar_stari; p++) {
+                if (v_stare[p] != -1) {
+
+                    for (int t = 0; t < numar_stari; t++) {
+                        if (vect_aux[t] == -1)
+                            vect_aux[t] = m_tranz[p][h][t];
+
+                    }
+
+                }
+            }
+//            for (int d = 0; d < numar_stari; d++)
+//                cout << vect_aux[d] << " ";
+//            cout << endl;
+
+            int gasit = 0;
+            for (int e = 0; e < nr_stari_DFA; e++) {
+                int ok = 1;
+                for (int o = 0; o < numar_stari; o++) {
+                    if (vect_aux[o] != v_stari_finaleDFA[e][o]) {
+                        ok = 0;
+                        break;
+                    }
+
+                }
+                if (ok == 1) {
+                    //stari identice
+                    gasit = 1;
+                    break;
+                }
+            }
+            if (gasit == 0) {
+                stare_curenta_dfa++;
+                nr_stari_DFA++;
+                for (int g = 0; g < numar_stari; g++)
+                    v_stari_finaleDFA[stare_curenta_dfa][g] = vect_aux[g];
+            }
+        }
+    }
+
+    cout << endl << endl;
+    cout << "Sunt " << nr_stari_DFA << " stari finale DFA(codate): " << endl;
+    for (int i = 0; i < nr_stari_DFA; i++) {
+        for (int j = 0; j < numar_stari; j++) {
+            cout << v_stari_finaleDFA[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << endl << endl;
+    cout << "Sunt " << nr_stari_DFA << " stari finale DFA(decodate): " << endl;
+    for (int i = 0; i < nr_stari_DFA; i++) {
+        for (int j = 0; j < numar_stari; j++) {
+            if (v_stari_finaleDFA[i][j] != -1)
+                cout << j << " ";
+        }
+        cout << endl;
+    }
+    cout << "starile finale DFA sunt: "<<endl;
+    int numar_stari_finale_DFA = 0;
+
+    for (int i = 0; i < nr_stari_DFA; i++) {
+        int ok=1;
+        
+        for (int z = 0; z < nr_st_finale; z++) {
+              if (v_stari_finaleDFA[i][v_st_finale[z]] != -1)
+                  ok=0;
+        }
+        if(ok==0){ 
+            cout<<"{ ";
+            numar_stari_finale_DFA++;
+        for (int j = 0; j < numar_stari; j++) {
+            if(v_stari_finaleDFA[i][j] != -1)
+                cout<<j<<" ";
+            }
+       
+            cout << "}"<< endl;
+         }
+    }
+    cout << endl <<"Numar stari finale in DFA: " <<numar_stari_finale_DFA << endl;
+    return 0;
+}
+
+
